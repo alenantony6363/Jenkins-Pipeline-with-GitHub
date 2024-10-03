@@ -27,10 +27,14 @@ pipeline {
             }
             post {
                 always {
-                    // Send email notification after test stage
+                    // Archive the log file for later access
+                    archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+                    
+                    // Send email notification with the log attached
                     mail to: "${EMAIL_RECIPIENT}",
                          subject: "Unit & Integration Test Stage: ${currentBuild.currentResult}",
-                         body: "The Unit and Integration Tests have finished with status: ${currentBuild.currentResult}. Check the Jenkins logs for more information."
+                         body: "The Unit and Integration Tests have finished with status: ${currentBuild.currentResult}. Check the Jenkins logs for more information.",
+                         attachLog: true
                 }
             }
         }
@@ -55,10 +59,14 @@ pipeline {
             }
             post {
                 always {
-                    // Send email notification after security scan stage
+                    // Archive the log file for security scan
+                    archiveArtifacts artifacts: '**/target/*.log', allowEmptyArchive: true
+                    
+                    // Send email notification after security scan stage with the log attached
                     mail to: "${EMAIL_RECIPIENT}",
                          subject: "Security Scan Stage: ${currentBuild.currentResult}",
-                         body: "The Security Scan has finished with status: ${currentBuild.currentResult}. Check the Jenkins logs for more information."
+                         body: "The Security Scan has finished with status: ${currentBuild.currentResult}. Check the Jenkins logs for more information.",
+                         attachLog: true
                 }
             }
         }
@@ -96,17 +104,20 @@ pipeline {
 
     post {
         failure {
-            // Send email notification if the pipeline fails at any point
+            // Send email notification if the pipeline fails at any point with the log attached
             mail to: "${EMAIL_RECIPIENT}",
                  subject: "Pipeline Failure: ${currentBuild.fullDisplayName}",
-                 body: "The pipeline has failed. Please check the Jenkins logs for details."
+                 body: "The pipeline has failed. Please check the Jenkins logs for details.",
+                 attachLog: true
         }
 
         success {
-            // Send email notification if the pipeline succeeds
+            // Send email notification if the pipeline succeeds with the log attached
             mail to: "${EMAIL_RECIPIENT}",
                  subject: "Pipeline Success: ${currentBuild.fullDisplayName}",
-                 body: "The pipeline has completed successfully."
+                 body: "The pipeline has completed successfully.",
+                 attachLog: true
         }
     }
 }
+
